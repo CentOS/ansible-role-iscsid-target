@@ -1,1 +1,25 @@
 # Defaults tasks for role iscsid-target
+
+- name: Install targetcli packages
+  yum:
+    name: ['targetcli', 'lvm2']
+    state: installed
+
+- name: Start and enable targetcli service
+  service:
+    name: target
+    enabled: true
+    state: started
+
+- name: Opening up iscsi portal
+  include_role:
+    name: iptables
+    tasks_from: custom-policy
+  vars:
+    iptables_policy_name: iscsid
+    iptables_protocol: tcp
+    iptables_port: "3260"
+    iptables_source: "0.0.0.0/0"
+  tags:
+    - iptables
+
