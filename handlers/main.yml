@@ -1,1 +1,4 @@
 # Defaults handlers for role iscsid-target
+- name: targetcli_save
+  command: targetcli saveconfig
+

@@ -1,1 +1,24 @@
 # Defaults variables for role iscsid-target
+
+# List of targets to configure, each entry needs at least one disk for backingstore, wwn and at least one initiator
+# Worth noting that we'll create LV in VG if declared under disks
+# default is no (in case of existing storage, or files, etc)
+# If you want this role to also create, check lv_init, vg_name and lv_size
+
+iscsi_targets:
+  - target1:
+    wwn: "iqn.2016-04.org.centos:target1"
+    disks:
+      - disk1:
+        path: /dev/vg_iscsi/target1
+        name: target1_disk1
+        type: block
+      - disk2:
+        path: /dev/vg_iscsi/target1-2
+        name: target1-2
+        type: block
+        lv_init: True
+        vg_name: vg_iscsi
+        lv_size: 2G
+    initiators:
+      - 'iqn.2016-04.org.centos:initiator1'

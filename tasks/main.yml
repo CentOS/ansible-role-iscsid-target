@@ -23,3 +23,69 @@
   tags:
     - iptables
 
+- name: Initializing LV if needed
+  lvol:
+    vg: "{{ item.1.vg_name }}"
+    lv: "{{ item.1.name }}"
+    size: "{{ item.1.lv_size | default('1G') }}"
+  with_subelements:
+    - "{{ iscsi_targets }}"
+    - disks
+  when: item.1.lv_init is defined and item.1.lv_init 
+  loop_control:
+    label: '{{ item.1.name }}'
+  tags:
+    - lvm
+ 
+
+- name: Configuring backstore objects
+  targetcli_backstore:
+    backstore_type: "{{ item.1.type }}"
+    backstore_name: "{{ item.1.name }}"
+    options: "{{ item.1.path }}"
+  with_subelements:
+    - "{{ iscsi_targets }}"
+    - disks
+  notify:
+    - targetcli_save
+  loop_control:
+    label: '{{ item.1.name }}'
+
+
+- name: Defining iSCSI targets
+  targetcli_iscsi:
+    wwn: "{{ item.wwn }}"
+  with_items: "{{ iscsi_targets }}"
+  notify:
+    - targetcli_save
+  loop_control:
+    label: '{{ item.wwn }}'
+
+
+- name: Defining ACLs for iSCSI target
+  targetcli_iscsi_acl:
+    wwn: "{{ item.0.wwn }}"
+    initiator_wwn: "{{ item.1 }}"
+  with_subelements:
+    - "{{ iscsi_targets }}"
+    - initiators
+  notify:
+    - targetcli_save
+  loop_control:
+    label: '{{ item.1 }}'
+
+- name: Assiging LUNs to Initiators
+  targetcli_iscsi_lun:
+    wwn: "{{ item.0.wwn }}"
+    backstore_type: "{{ item.1.type }}"
+    backstore_name: "{{ item.1.name }}"
+  with_subelements:
+    - "{{ iscsi_targets }}"
+    - disks
+  notify:
+    - targetcli_save
+  loop_control:
+    label: '{{ item.1.name }}'
+
+
+
