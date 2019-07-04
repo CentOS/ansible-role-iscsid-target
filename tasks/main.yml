@@ -36,7 +36,7 @@
     label: '{{ item.1.name }}'
   tags:
     - lvm
- 
+    - targets 
 
 - name: Configuring backstore objects
   targetcli_backstore:
@@ -50,7 +50,8 @@
     - targetcli_save
   loop_control:
     label: '{{ item.1.name }}'
-
+  tags:
+    - targets
 
 - name: Defining iSCSI targets
   targetcli_iscsi:
@@ -60,7 +61,8 @@
     - targetcli_save
   loop_control:
     label: '{{ item.wwn }}'
-
+  tags:
+    - targets
 
 - name: Defining ACLs for iSCSI target
   targetcli_iscsi_acl:
@@ -73,6 +75,8 @@
     - targetcli_save
   loop_control:
     label: '{{ item.1 }}'
+  tags:
+    - targets
 
 - name: Assiging LUNs to Initiators
   targetcli_iscsi_lun:
@@ -86,6 +90,7 @@
     - targetcli_save
   loop_control:
     label: '{{ item.1.name }}'
-
+  tags:
+    - targets
 
 
